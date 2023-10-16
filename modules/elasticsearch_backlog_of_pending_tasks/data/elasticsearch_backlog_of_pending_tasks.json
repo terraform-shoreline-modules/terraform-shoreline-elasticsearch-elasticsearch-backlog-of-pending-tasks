@@ -1,0 +1,162 @@
+{
+  "name": "elasticsearch_backlog_of_pending_tasks",
+  "description": "This incident type occurs when there is a backlog of pending tasks in Elasticsearch. Elasticsearch is a search engine that handles large amounts of data and performs various tasks, such as indexing and searching. When there is a backlog of tasks, it means that the system is not able to process requests in a timely manner, which can lead to performance issues and data inconsistencies. This can happen due to various reasons, such as hardware or network issues, software bugs, or heavy traffic on the system.",
+  "params": [
+    {
+      "name": "NODE_COUNT",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_URL",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_LOG_FILE_PATH",
+      "value": ""
+    },
+    {
+      "name": "NEW_MEMORY_IN_GB",
+      "value": ""
+    },
+    {
+      "name": "ELASTICSEARCH_DATA_DIRECTORY",
+      "value": ""
+    },
+    {
+      "name": "NEW_DISK_SPACE_IN_GB",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Elasticsearch Backlog of Pending Tasks\nThis incident type occurs when there is a backlog of pending tasks in Elasticsearch. Elasticsearch is a search engine that handles large amounts of data and performs various tasks, such as indexing and searching. When there is a backlog of tasks, it means that the system is not able to process requests in a timely manner, which can lead to performance issues and data inconsistencies. This can happen due to various reasons, such as hardware or network issues, software bugs, or heavy traffic on the system."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch cluster health status"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -X GET ${ELASTICSEARCH_URL}/_cluster/health`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch cluster state"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -X GET ${ELASTICSEARCH_URL}/_cluster/state`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch node stats"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -X GET ${ELASTICSEARCH_URL}/_nodes/stats`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch pending tasks"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -X GET ${ELASTICSEARCH_URL}/_cluster/pending_tasks`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch task management API"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `curl -X GET ${ELASTICSEARCH_URL}/_tasks?detailed=true`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch logs for errors or warnings"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `sudo grep -i \"error\\|warning\" ${ELASTICSEARCH_LOG_FILE_PATH}`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch disk usage"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `df -h ${ELASTICSEARCH_DATA_DIRECTORY}`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Elasticsearch memory usage"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ps -ef | grep elasticsearch | grep -v grep | awk '{print $2}' | xargs pmap | grep total`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the hardware resources of the Elasticsearch cluster to handle the load and reduce the backlog. This can involve adding more nodes to the cluster, increasing the amount of memory or disk space available, or optimizing the network configuration."
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_setup_elasticsearch($NODE_COUNT, $ELASTICSEARCH_CLUSTER_NAME, $NEW_MEMORY_IN_GB, $NEW_DISK_SPACE_IN_GB)"
+    }
+  ]
+}
